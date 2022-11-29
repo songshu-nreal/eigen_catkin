@@ -16,7 +16,14 @@ set(EIGEN_MINIMUM_VERSION 3.3.4)
 # If set to ON, will use the system version of Eigen.
 # If set to AUTO, will determine if the system version is suitable.
 set(USE_SYSTEM_EIGEN "AUTO" CACHE INTERNAL "Whether to use the system version of Eigen.")
-include(${CMAKE_CURRENT_SOURCE_DIR}/use-system-installation-of-eigen.cmake)
+
+if(ANDROID_NREAL)
+  string(REPLACE "\"" "" TMP_BUILD_CONFIG ${ANDROID_NREAL_BUILD_CONFIG})
+  string(REPLACE " " ";" BUILD_CONFIG ${TMP_BUILD_CONFIG})
+  set(USE_SYSTEM_EIGEN "OFF")
+else()
+  include(${CMAKE_CURRENT_SOURCE_DIR}/use-system-installation-of-eigen.cmake)
+endif()
 
 # Check if the version is suitable, otherwise force downloading the newer one.
 if(USE_SYSTEM_EIGEN STREQUAL "AUTO")
@@ -85,10 +92,11 @@ else()
   file(MAKE_DIRECTORY ${EIGEN_CATKIN_EIGEN_INCLUDE})
   ExternalProject_Add(eigen_src
     UPDATE_COMMAND ""
-    URL https://gitlab.com/libeigen/eigen/-/archive/3.3.4/eigen-3.3.4.tar.bz2
-    URL_MD5 6e74a04aeab3417120f1bdef6f3b4881
-    PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/StdVector.patch && patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/DisableTests.patch && patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/FixWarning.patch
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${CATKIN_DEVEL_PREFIX} -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_TESTING=OFF
+    URL file://${CMAKE_CURRENT_SOURCE_DIR}/eigen-3.3.4.tar.bz2
+    PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/StdVector.patch &&
+                  patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/DisableTests.patch &&
+                  patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/FixWarning.patch
+    CMAKE_ARGS . -DCMAKE_INSTALL_PREFIX:PATH=${CATKIN_DEVEL_PREFIX} -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_TESTING=OFF ${BUILD_CONFIG}
   )
 
   if(EXISTS ${EIGEN_CATKIN_EIGEN_INCLUDE_SIGNATURE}.off)
@@ -96,12 +104,25 @@ else()
   endif()
 
   message(STATUS "Using eigen_catkin's Eigen in ${EIGEN_CATKIN_EIGEN_INCLUDE}")
+endif()
 
+cs_add_library(${PROJECT_NAME} src/dependency_tracker.cc)
+
+if(NOT USE_SYSTEM_EIGEN)
+  add_dependencies(${PROJECT_NAME} eigen_src)
+endif()
+
+cs_install()
+
+if(NOT USE_SYSTEM_EIGEN)
   install(DIRECTORY ${EIGEN_CATKIN_EIGEN_INCLUDE}
           DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-  )
+          FILES_MATCHING PATTERN "*.hpp"
+          PATTERN "*.h"
+          PATTERN ".svn" EXCLUDE
+          )
 endif()
 
 cs_export(INCLUDE_DIRS ${EIGEN_CATKIN_EIGEN_INCLUDE}
-          DEPENDS ${_DEPENDS}
-          CFG_EXTRAS eigen-extras.cmake)
+        DEPENDS ${_DEPENDS}
+        CFG_EXTRAS eigen-extras.cmake)
