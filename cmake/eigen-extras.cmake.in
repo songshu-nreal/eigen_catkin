@@ -1,6 +1,4 @@
-if("@INSTALLSPACE@" STREQUAL "TRUE" AND "@USE_SYSTEM_EIGEN@" STREQUAL "OFF")
-  set(@PROJECT_NAME@_INCLUDE_DIRS ${@PROJECT_NAME@_INCLUDE_DIRS}/eigen3)
-endif()
+set(@PROJECT_NAME@_INCLUDE_DIRS @EIGEN_CATKIN_EIGEN_INCLUDE@)
 
 # The following eigen_catkin_enforce macro can be called in a depending 
 # project's CMakeLists.txt file (Below findpackage eigen_catkin or the 

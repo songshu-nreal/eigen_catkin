@@ -1,0 +1,49 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -333,7 +333,7 @@
+
+ add_subdirectory(Eigen)
+
+-add_subdirectory(doc EXCLUDE_FROM_ALL)
++#add_subdirectory(doc EXCLUDE_FROM_ALL)
+
+ include(EigenConfigureTesting)
+
+@@ -341,23 +341,23 @@
+ enable_testing() # must be called from the root CMakeLists, see man page
+
+
+-if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+-  add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
+-else()
+-  add_subdirectory(test EXCLUDE_FROM_ALL)
+-endif()
+-
+-if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
+-  add_subdirectory(blas)
+-  add_subdirectory(lapack)
+-else()
+-  add_subdirectory(blas EXCLUDE_FROM_ALL)
+-  add_subdirectory(lapack EXCLUDE_FROM_ALL)
+-endif()
++#if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
++#  add_subdirectory(test) # can't do EXCLUDE_FROM_ALL here, breaks CTest
++#else()
++#  add_subdirectory(test EXCLUDE_FROM_ALL)
++#endif()
++#
++#if(EIGEN_LEAVE_TEST_IN_ALL_TARGET)
++#  add_subdirectory(blas)
++#  add_subdirectory(lapack)
++#else()
++#  add_subdirectory(blas EXCLUDE_FROM_ALL)
++#  add_subdirectory(lapack EXCLUDE_FROM_ALL)
++#endif()
+
+ add_subdirectory(unsupported)
+
+-add_subdirectory(demos EXCLUDE_FROM_ALL)
++#add_subdirectory(demos EXCLUDE_FROM_ALL)
+
+ # must be after test and unsupported, for configuring buildtests.in
+ add_subdirectory(scripts EXCLUDE_FROM_ALL)

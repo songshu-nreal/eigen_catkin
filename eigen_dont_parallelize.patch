@@ -1,0 +1,11 @@
+--- Eigen/Core	2016-10-04 07:21:16.000000000 +0000
++++ Eigen/Core	2018-08-27 06:50:26.465562700 +0000
+@@ -11,6 +11,8 @@
+ #ifndef EIGEN_CORE_H
+ #define EIGEN_CORE_H
+ 
++#define EIGEN_DONT_PARALLELIZE
++
+ // first thing Eigen does: stop the compiler from committing suicide
+ #include "src/Core/util/DisableStupidWarnings.h"
+ 

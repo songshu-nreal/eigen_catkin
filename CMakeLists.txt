@@ -10,7 +10,7 @@ include(ExternalProject)
 set(EIGEN_CATKIN_EIGEN_INCLUDE ${CATKIN_DEVEL_PREFIX}/include/eigen3)
 set(EIGEN_CATKIN_EIGEN_INCLUDE_SIGNATURE ${EIGEN_CATKIN_EIGEN_INCLUDE}/signature_of_eigen3_matrix_library)
 
-set(EIGEN_MINIMUM_VERSION 3.3.4)
+set(EIGEN_MINIMUM_VERSION 3.2.10)
 
 # If set to OFF, will compile the given version of Eigen.
 # If set to ON, will use the system version of Eigen.
@@ -18,11 +18,11 @@ set(EIGEN_MINIMUM_VERSION 3.3.4)
 set(USE_SYSTEM_EIGEN "AUTO" CACHE INTERNAL "Whether to use the system version of Eigen.")
 
 if(ANDROID_NREAL)
-  string(REPLACE "\"" "" TMP_BUILD_CONFIG ${ANDROID_NREAL_BUILD_CONFIG})
-  string(REPLACE " " ";" BUILD_CONFIG ${TMP_BUILD_CONFIG})
-  set(USE_SYSTEM_EIGEN "OFF")
+	string(REPLACE "\"" "" TMP_BUILD_CONFIG ${ANDROID_NREAL_BUILD_CONFIG})
+	string(REPLACE " " ";" BUILD_CONFIG ${TMP_BUILD_CONFIG})
+	set(USE_SYSTEM_EIGEN "OFF")
 else()
-  include(${CMAKE_CURRENT_SOURCE_DIR}/use-system-installation-of-eigen.cmake)
+ 	include(${CMAKE_CURRENT_SOURCE_DIR}/use-system-installation-of-eigen.cmake)
 endif()
 
 # Check if the version is suitable, otherwise force downloading the newer one.
@@ -92,11 +92,11 @@ else()
   file(MAKE_DIRECTORY ${EIGEN_CATKIN_EIGEN_INCLUDE})
   ExternalProject_Add(eigen_src
     UPDATE_COMMAND ""
-    URL file://${CMAKE_CURRENT_SOURCE_DIR}/eigen-3.3.4.tar.bz2
-    PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/StdVector.patch &&
-                  patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/DisableTests.patch &&
-                  patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/FixWarning.patch
-    CMAKE_ARGS . -DCMAKE_INSTALL_PREFIX:PATH=${CATKIN_DEVEL_PREFIX} -DCMAKE_BUILD_TYPE:STRING=Release -DBUILD_TESTING=OFF ${BUILD_CONFIG}
+    URL file://${CMAKE_CURRENT_SOURCE_DIR}/3.2.10.tar.bz2
+    PATCH_COMMAND patch -p0 < ${CMAKE_SOURCE_DIR}/StdVector.patch &&
+                  patch -p0 < ${CMAKE_SOURCE_DIR}/eigen.patch &&
+                  patch -p0 < ${CMAKE_SOURCE_DIR}/eigen_dont_parallelize.patch
+    CMAKE_ARGS . -DCMAKE_INSTALL_PREFIX:PATH=${CATKIN_DEVEL_PREFIX} -DCMAKE_BUILD_TYPE:STRING=Release ${BUILD_CONFIG}
   )
 
   if(EXISTS ${EIGEN_CATKIN_EIGEN_INCLUDE_SIGNATURE}.off)
@@ -116,13 +116,13 @@ cs_install()
 
 if(NOT USE_SYSTEM_EIGEN)
   install(DIRECTORY ${EIGEN_CATKIN_EIGEN_INCLUDE}
-          DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-          FILES_MATCHING PATTERN "*.hpp"
-          PATTERN "*.h"
-          PATTERN ".svn" EXCLUDE
-          )
+    DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.hpp"
+    PATTERN "*.h"
+    PATTERN ".svn" EXCLUDE
+  )
 endif()
 
 cs_export(INCLUDE_DIRS ${EIGEN_CATKIN_EIGEN_INCLUDE}
-        DEPENDS ${_DEPENDS}
-        CFG_EXTRAS eigen-extras.cmake)
+          DEPENDS ${_DEPENDS}
+          CFG_EXTRAS eigen-extras.cmake)
